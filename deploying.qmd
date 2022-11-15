@@ -64,3 +64,7 @@ Check out the Rancher Desktop in the `images` tab to view and monitor your image
 ### Next steps:
 
 Write a shell script that will do some of these steps manually for other non-technical people. Ideally, they run one command in a shell script and then everything installs for them.
+
+#### resources::
+ - Good tutorial at [this github](https://github.com/andrew-couch/Tidy-Tuesday/blob/master/Season%202/Apps/R_Shiny_Deployment/Dockerfile)
+ - [Video walkthrough](https://www.youtube.com/watch?v=ARd5IldVFUs)
