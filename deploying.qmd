@@ -1,0 +1,66 @@
+---
+title: "Deploying a Shiny App using Kubernetes"
+author: Alex Bass
+date: 15 November 2022
+format: html
+---
+
+### Step 1: Install Rancher Desktop
+
+The first step is to install [Rancher Desktop](https://rancherdesktop.io/) using the portal manager. The version I used is version 1.5.1. It took me about 20 minutes to install. I beleive I had to prompt Portal Manager to install a few times.
+
+### Step 2: Place all files necessary to run app in Folder called R.
+
+This will help with finding relevant files when the Script is ran. 
+
+*It also important to change all file paths so they only source and reference files from this folder. So, change file paths accordingly. When the app is running, it can still grab files from any where on your computer, but to build it all files should come from this folder.*
+
+### Step 3: Create a Dockerfile for building
+
+You can copy the file that I used for my conainerized app which is found [here](https://github.com/alexb-dynata/joining_ui/blob/main/Dockerfile). 
+
+Within the file, change the install packages line to match the packages your shiny app / sourcing scripts need.
+
+I used port 3838, but if you need to change the port for any reason, you will need to edit that line in the file here.
+
+When implementing python code and finding python interpretter, I imagine that this part will need to be changed, but we can cross that bridge later.
+
+*Note: Make sure the file is entitled: `Dockerfile` with no extension*
+
+### Step 4: Open your CL tool and navigate to your app's directory
+
+For me this command is:
+
+```{sh}
+cd .\projects\joining_ui\
+```
+
+### Step 5: Build the Docker Image
+
+Change the app name as you like. Mine was called `joinin-ui` - this is just a name to reference in Rancher Desktop, it doesn't have any significance in your app. Don't forget the `.` at the end.
+
+```{sh}
+docker build -t joinin-ui .
+```
+
+This process took about 10 minutes to finish as a time estimate for you.
+
+### Step 6: Run Container
+
+Remember to write in your app name in place of `joining-ui` and, if you changed the port name, in your `Dockerfile`, you can change the port here as well.
+
+```{sh}
+docker run -d --rm -p 3838:3838 joinin-ui
+```
+
+### Step 7: Open your webpage
+
+Congrats! You're app is now deployed. Follow this link (http://localhost:3838/) to see your live app. If you changed ports, just change the url above accordingly.
+
+### (OPTIONAL) Step 8: Monitor Container
+
+Check out the Rancher Desktop in the `images` tab to view and monitor your image and delete it if necessary!
+
+### Next steps:
+
+Write a shell script that will do some of these steps manually for other non-technical people. Ideally, they run one command in a shell script and then everything installs for them.

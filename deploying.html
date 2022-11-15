@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Alex Bass">
+<meta name="dcterms.date" content="2022-11-15">
+
+<title>Deploying a Shiny App using Kubernetes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="deploying_files/libs/clipboard/clipboard.min.js"></script>
+<script src="deploying_files/libs/quarto-html/quarto.js"></script>
+<script src="deploying_files/libs/quarto-html/popper.min.js"></script>
+<script src="deploying_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="deploying_files/libs/quarto-html/anchor.min.js"></script>
+<link href="deploying_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="deploying_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="deploying_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="deploying_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="deploying_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Deploying a Shiny App using Kubernetes</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Bass </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 15, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="step-1-install-rancher-desktop" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-install-rancher-desktop">Step 1: Install Rancher Desktop</h3>
+<p>The first step is to install <a href="https://rancherdesktop.io/">Rancher Desktop</a> using the portal manager. The version I used is version 1.5.1. It took me about 20 minutes to install. I beleive I had to prompt Portal Manager to install a few times.</p>
+</section>
+<section id="step-2-place-all-files-necessary-to-run-app-in-folder-called-r." class="level3">
+<h3 class="anchored" data-anchor-id="step-2-place-all-files-necessary-to-run-app-in-folder-called-r.">Step 2: Place all files necessary to run app in Folder called R.</h3>
+<p>This will help with finding relevant files when the Script is ran.</p>
+<p><em>It also important to change all file paths so they only source and reference files from this folder. So, change file paths accordingly. When the app is running, it can still grab files from any where on your computer, but to build it all files should come from this folder.</em></p>
+</section>
+<section id="step-3-create-a-dockerfile-for-building" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-create-a-dockerfile-for-building">Step 3: Create a Dockerfile for building</h3>
+<p>You can copy the file that I used for my conainerized app which is found <a href="https://github.com/alexb-dynata/joining_ui/blob/main/Dockerfile">here</a>.</p>
+<p>Within the file, change the install packages line to match the packages your shiny app / sourcing scripts need.</p>
+<p>I used port 3838, but if you need to change the port for any reason, you will need to edit that line in the file here.</p>
+<p>When implementing python code and finding python interpretter, I imagine that this part will need to be changed, but we can cross that bridge later.</p>
+<p><em>Note: Make sure the file is entitled: <code>Dockerfile</code> with no extension</em></p>
+</section>
+<section id="step-4-open-your-cl-tool-and-navigate-to-your-apps-directory" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-open-your-cl-tool-and-navigate-to-your-apps-directory">Step 4: Open your CL tool and navigate to your app’s directory</h3>
+<p>For me this command is:</p>
+<pre class="{sh}"><code>cd .\projects\joining_ui\</code></pre>
+</section>
+<section id="step-5-build-the-docker-image" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-build-the-docker-image">Step 5: Build the Docker Image</h3>
+<p>Change the app name as you like. Mine was called <code>joinin-ui</code> - this is just a name to reference in Rancher Desktop, it doesn’t have any significance in your app. Don’t forget the <code>.</code> at the end.</p>
+<pre class="{sh}"><code>docker build -t joinin-ui .</code></pre>
+<p>This process took about 10 minutes to finish as a time estimate for you.</p>
+</section>
+<section id="step-6-run-container" class="level3">
+<h3 class="anchored" data-anchor-id="step-6-run-container">Step 6: Run Container</h3>
+<p>Remember to write in your app name in place of <code>joining-ui</code> and, if you changed the port name, in your <code>Dockerfile</code>, you can change the port here as well.</p>
+<pre class="{sh}"><code>docker run -d --rm -p 3838:3838 joinin-ui</code></pre>
+</section>
+<section id="step-7-open-your-webpage" class="level3">
+<h3 class="anchored" data-anchor-id="step-7-open-your-webpage">Step 7: Open your webpage</h3>
+<p>Congrats! You’re app is now deployed. Follow this link (http://localhost:3838/) to see your live app. If you changed ports, just change the url above accordingly.</p>
+</section>
+<section id="optional-step-8-monitor-container" class="level3">
+<h3 class="anchored" data-anchor-id="optional-step-8-monitor-container">(OPTIONAL) Step 8: Monitor Container</h3>
+<p>Check out the Rancher Desktop in the <code>images</code> tab to view and monitor your image and delete it if necessary!</p>
+</section>
+<section id="next-steps" class="level3">
+<h3 class="anchored" data-anchor-id="next-steps">Next steps:</h3>
+<p>Write a shell script that will do some of these steps manually for other non-technical people. Ideally, they run one command in a shell script and then everything installs for them.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
