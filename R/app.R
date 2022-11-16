@@ -3,6 +3,9 @@
 # Next steps : filtering based on selected, whole data frame editing, merging two versions (do it when the radio switches)
 
 library(shiny)
+library(openxlsx)
+library(naturalsort)
+library(stringr)
 library(DT) 
 library(tidyverse)
 library(shinyjs) #reveal download button
@@ -102,6 +105,8 @@ server <- function(input, output, session) {
     })
     
     observeEvent(input$qmap,  {
+        
+        print(input$qmap$datapath)
         
         df <- openxlsx::read.xlsx(input$qmap$datapath) |>
             dplyr::mutate(inx = factor(question_id, levels = unique(question_id))) |>

@@ -20,7 +20,7 @@ RUN apt-get update && \
     apt-get clean
     
 
-RUN R -e "install.packages(pkgs=c('shiny','tidyverse','shinyjs', 'shinyalert', 'DT'), repos='https://cran.rstudio.com/')" 
+RUN R -e "install.packages(pkgs=c('shiny','tidyverse','shinyjs', 'shinyalert', 'DT', 'openxlsx', 'naturalsort'), repos='https://cran.rstudio.com/')" 
 
 RUN mkdir /root/app
 
